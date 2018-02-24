@@ -10,9 +10,6 @@ def xml2csv(inputfile, outputfile):
 
     projects = root.findall(".//Hsrproj")
 
-    Investigator_list = root.findall(".//Investigator")
-    total_len = len(Investigator_list)
-
     for project in projects:
         FundMount = ""
         if len(project.findall(".//YearFundingAmount/Amount")) > 0:
