@@ -12,11 +12,20 @@ def xml2csv(inputfile, outputfile):
 
     for project in projects:
         FundMount = ""
-        if len(project.findall(".//YearFundingAmount/Amount")) > 0:
-            for x in project.findall(".//YearFundingAmount/Amount"):
-                if x.text is None:
+        FundYear = ""
+        if len(project.findall(".//YearFundingAmount")) > 0:
+            for x in project.findall(".//YearFundingAmount"):
+                year = x.findall(".//Year")[0]
+                amount = x.findall(".//Amount")[0]
+                
+                if year.text is None:
                     continue
-                FundMount = x.text + ','
+                if amount.text is None:
+                    continue
+
+                FundYear += year.text + "|"
+                FundMount += amount.text + '|'
+       
 
         project_dict = {}
         projects_dict= {
@@ -44,7 +53,7 @@ def xml2csv(inputfile, outputfile):
             "MeshList": ",".join([x.text for x in project.findall(".//MeshHeading/*")]),
             "MajorTopic": ",".join([x.text for x in project.findall(".//MeshHeading/QualifierName")]),
             "Keywords": ",".join([x.text for x in project.findall(".//Keyword")]),
-            "FundYear": ",".join([x.text for x in project.findall(".//YearFundingAmount/Year")]) if len(project.findall(".//YearFundingAmount/Year")) > 0 else "",
+            "FundYear": FundYear,
             "FundMount": FundMount,
             "NumberOfSubjects": project.findall(".//NumberOfSubjects")[0].text if len(project.findall(".//NumberOfSubjects")) > 0 else "",
             "PopulationBase": project.findall(".//PopulationBase")[0].text if len(project.findall(".//PopulationBase")) > 0 else "",
