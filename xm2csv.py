@@ -3,14 +3,15 @@ import csv
 
 def xml2csv(inputfile, outputfile):
     projects_list = []
-    # project_dict = {}
     file_name = inputfile
+    #get xml tree root
     tree = ET.parse(file_name)
     root = tree.getroot()
-
+    #slice xml tree by projects
     projects = root.findall(".//Hsrproj")
-
+    #iterate project
     for project in projects:
+        #attach Fund year and Fund mount value
         FundMount = ""
         FundYear = ""
         if len(project.findall(".//YearFundingAmount")) > 0:
@@ -25,9 +26,7 @@ def xml2csv(inputfile, outputfile):
 
                 FundYear += year.text + "|"
                 FundMount += amount.text + '|'
-       
-
-        project_dict = {}
+       #build attribute dictionary
         projects_dict= {
             "ProjectID": project.findall(".//ProjectID")[0].text,
             "DateCreated": "/".join([item.text for item in project.findall(".//DateCreated/*")]),
@@ -60,12 +59,13 @@ def xml2csv(inputfile, outputfile):
             "StudyDesign": project.findall(".//StudyDesign")[0].text if len(project.findall(".//StudyDesign")) > 0 else "",
 
         }
+        #append to project list
         projects_list.append(projects_dict)
-
+    #build header name
     header = []
     for key, value in projects_list[0].items():
         header.append(key)
-
+    #write to csv file
     with open(outputfile, 'a+', newline = '', encoding = 'utf-8') as csv_f:
         writer = csv.DictWriter(csv_f, fieldnames=header, delimiter=',', quoting=csv.QUOTE_ALL)
         writer.writeheader()
