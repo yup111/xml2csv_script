@@ -3,6 +3,45 @@
 
 import xml.etree.ElementTree as ET
 import csv
+import os
+import pandas as pd 
+
+def find_duplicate(directory):
+    df_= pd.DataFrame()
+    list_=[]
+
+    for root, dirs, files in os.walk(os.path.abspath(directory)):
+        for f in files:
+            df_dummy = pd.read_csv(os.path.join(root, f), index_col=None, header=0)
+            list_.append(df_dummy)
+    
+    df_ = pd.concat(list_)
+    projects = df_.groupby("ProjectID")
+
+    df_duplicate = pd.DataFrame()
+    list_duplicate = []
+
+    for id_, project in projects:
+        print(len(project))
+        if(len(project) > 1):
+            list_duplicate.append(project)
+
+    df_duplicate = pd.concat(list_duplicate)
+    df_duplicate.to_csv("duplicate.csv")
+
+def merge_files(directory):
+    df_= pd.DataFrame()
+    list_=[]
+    record_set = set()
+
+    for root, dirs, files in os.walk(os.path.abspath(directory)):
+        for f in files:
+            df_dummy = pd.read_csv(os.path.join(root, f), index_col=None, header=0)
+            list_.append(df_dummy)
+    
+    df_ = pd.concat(list_)
+    no_duplicates = df_.drop_duplicates(subset='ProjectID', keep="last")
+    no_duplicates.to_csv("no_duplicate.csv")
 
 def xml2csv(inputfile, outputfile):
     projects_list = []
@@ -76,5 +115,6 @@ def xml2csv(inputfile, outputfile):
             writer.writerow(project)
 
 if __name__ == "__main__":
+    merge_files("../csv")
 
-    xml2csv('16_9.xml', '16_9.csv')
+    # xml2csv('16_9.xml', '16_9.csv')
